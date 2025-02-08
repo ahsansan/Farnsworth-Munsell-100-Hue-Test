@@ -163,6 +163,7 @@ export default function TestColorComponent() {
     ]);
     const [result, setResult] = useState({});
     const [isResult, setIsResult] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const shuffleColors = (array) => {
         const colors = array.map(item => item.color);
@@ -213,12 +214,17 @@ export default function TestColorComponent() {
     };
 
     const handleResult = async () => {
+        setIsLoading(true);
         try {
-            const dataResult = await matchColors(data, dataAnswer);
-            setIsResult(true);
-            setResult(dataResult);
+            setTimeout(async () => {
+                const dataResult = await matchColors(data, dataAnswer);
+                setIsResult(true);
+                setResult(dataResult);
+                setIsLoading(false);
+            }, 2000);
         } catch(error) {
             console.log(error);
+            setIsLoading(false);
         }
     }
 
@@ -242,20 +248,20 @@ export default function TestColorComponent() {
                     </div>
                     <p>Hasil: <span className='font-bold'>{result.totalIncorrect}</span></p>
                     <p><span className='underline'>
-                        {resetResult.totalIncorrect === 0 ? "Hasil sempurna! Kamu memiliki kemampuan membedakan rona warna yang sangat baik. 👌" 
-                            : (resetResult.totalIncorrect >= 1 && resetResult.totalIncorrect <= 2) ? "Hasil hampir sempurna! Kamu memiliki penglihatan warna yang normal dengan sedikit kesalahan kecil. ✅" 
-                            : (resetResult.totalIncorrect >= 3 && resetResult.totalIncorrect <= 4) ? "Hasil normal, tetapi ada beberapa kesalahan. Perhatikan kembali kondisi penglihatanmu. ⚠️" 
+                        {result.totalIncorrect === 0 ? "Hasil sempurna! Kamu memiliki kemampuan membedakan rona warna yang sangat baik. 👌" 
+                            : (result.totalIncorrect >= 1 && result.totalIncorrect <= 2) ? "Hasil hampir sempurna! Kamu memiliki penglihatan warna yang normal dengan sedikit kesalahan kecil. ✅" 
+                            : (result.totalIncorrect >= 3 && result.totalIncorrect <= 4) ? "Hasil normal, tetapi ada beberapa kesalahan. Perhatikan kembali kondisi penglihatanmu. ⚠️" 
                             : "Kamu mungkin memiliki gangguan penglihatan warna. Disarankan untuk berkonsultasi dengan ahli mata. 🚨"}
                     </span>
                     </p>
                     <div className='bg-yellow-50 border border-yellow-500 p-5 rounded-md my-5'>
                         <p className='text-sm'>
                             <span className='font-bold'>Interpretasi: </span>
-                            {resetResult.totalIncorrect === 0 
+                            {result.totalIncorrect === 0 
                                 ? "Tidak ada kesalahan dalam mengidentifikasi warna, menunjukkan penglihatan warna yang normal dan akurat." 
-                                : (resetResult.totalIncorrect >= 1 && resetResult.totalIncorrect <= 2) 
+                                : (result.totalIncorrect >= 1 && result.totalIncorrect <= 2) 
                                 ? "Kesalahan kecil mungkin disebabkan oleh faktor seperti pencahayaan, kelelahan mata, atau variasi alami dalam persepsi warna." 
-                                : (resetResult.totalIncorrect >= 3 && resetResult.totalIncorrect <= 4) 
+                                : (result.totalIncorrect >= 3 && result.totalIncorrect <= 4) 
                                 ? "Meskipun masih dalam rentang normal, kesalahan yang lebih banyak bisa menjadi tanda awal kelelahan mata atau sedikit penurunan sensitivitas warna." 
                                 : "Skor ini menunjukkan kemungkinan adanya color vision deficiency (buta warna parsial atau total), seperti kesulitan membedakan warna merah-hijau atau biru-kuning."
                             }
@@ -319,7 +325,14 @@ export default function TestColorComponent() {
                         </div>
                         </div>
                     ))}
-                    <ButtonClick onClick={handleResult} label={"Cek Data"} />
+                    <div className="flex justify-center">
+                        <button 
+                        className={`${isLoading ? 'bg-[#cad8f5]' : 'bg-[#2e5cb8] hover:bg-[#4775d1]'} px-4 py-2 rounded-md my-4`} 
+                        onClick={handleResult}
+                        disabled={isLoading}>
+                            <span className="font-bold text-white">{isLoading ? "Loading..." : "Cek Hasil Test"}</span>
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
