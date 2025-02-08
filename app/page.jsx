@@ -13,7 +13,7 @@ export default function Home() {
         <img src="/farnsworth100.jpg" className="my-3" />
         <p className="my-5 text-sm">Keping-keping warna disusun dalam empat baris berdasarkan rona warna. Baris-baris tersebut mencakup rona oranye/magenta, rona kuning/hijau, rona biru/ungu, dan rona ungu/magenta, secara berurutan. Tes fisik ini disajikan di atas latar belakang hitam untuk mengisolasi dan menonjolkan rona warna. Keping-keping warnanya berbentuk bulat dengan diameter sekitar satu inci.</p>
         <h1 className="font-bold text-xl underline my-5">Tes Buta Warna Farnsworth Munsell 100 Hue Online</h1>
-        <p className="my-5 text-sm">Ini adalah versi online dari tes Farnsworth Munsell 100 Hue, yang dibatasi hingga 40 warna. Pada perangkat mobile, tes ini tidak optimal, disarankan menggunakan PC atau tablet untuk pengujian.</p>
+        <p className="my-5 text-sm">Ini adalah versi online dari tes Farnsworth Munsell 100 Hue, yang dibatasi hingga 40 warna.</p>
         <p className="my-5 text-sm">Diagram menunjukkan wilayah spektrum warna di mana kemampuan membedakan warna rendah. Semakin rendah skor, semakin baik hasilnya. Skor 0 adalah hasil sempurna. Poin kesalahan antara 1 hingga 4 dianggap hampir normal, dengan 1-2 kesalahan kecil. Jika skor kesalahan Anda lebih dari 4, kemungkinan Anda memiliki kekurangan dalam penglihatan warna (buta warna).</p>
         <Link href="/farnsworth-munsell-100-hue-test">
           <button className="bg-[#2e5cb8] hover:bg-[#4775d1] px-4 py-2 rounded-md my-4">
