@@ -1,11 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
+import { DndContext, closestCenter, useSensors, useSensor, MouseSensor, TouchSensor } from '@dnd-kit/core';
 import {
     SortableContext,
     horizontalListSortingStrategy,
     verticalListSortingStrategy,
-    arrayMove,
+    arrayMove
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -234,6 +234,7 @@ export default function TestColorComponent() {
         setResult({});
     }
 
+    // Mobile Version
     const [activeIndex, setActiveIndex] = useState(0);
     const orders = ["A", "B", "C", "D"];
     const currentGroup = data.find(group => group.order === orders[activeIndex]);
@@ -251,6 +252,16 @@ export default function TestColorComponent() {
             setActiveIndex(prev => prev - 1);
         }
     };
+
+    const sensors = useSensors(
+        useSensor(MouseSensor), 
+        useSensor(TouchSensor, {
+            activationConstraint: {
+            delay: 250,
+            tolerance: 5,
+            },
+        })
+    );
 
     if (!isClient) return null;
 
@@ -295,30 +306,31 @@ export default function TestColorComponent() {
                     <div className='mb-9 max-w-xl mx-auto'>
                         <p className='text-center font-bold my-1'>Susun warna berdasarkan rona (hue) di setiap baris dengan cara menyeret dan meletakkan kotak, lalu klik 'Cek Hasil Test' untuk melihat hasil Anda.</p>
                         <p className='text-center font-bold my-1'>Warna pertama dan terakhir di setiap baris sudah tetap.</p>
-                        <p className='text-center font-bold my-1'>Jika Anda menggunakan PC atau Tablet geser urutannya secara horizontal dan jika anda menggunakan mobile, geser urutannya secara vertical.</p>
+                        <p className='text-center font-bold my-1'>Jika Anda menggunakan PC atau Tablet geser urutannya secara horizontal dan jika anda menggunakan mobile, geser urutannya secara vertical (tahan dulu block yang mau digeser).</p>
                     </div>
                     {/* Drag and Drop Area */}
                     <div className="w-full">
-                    {window.innerWidth < 768 ? (
+                    {window.innerWidth < 665 ? (
                         // Mobile (Per Page)
                         currentGroup && (
                         <div className="flex flex-col items-center">
                             <div style={{ backgroundColor: currentGroup.startColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', marginBottom: '10px' }}></div>
 
                             <DndContext
-                            collisionDetection={closestCenter}
-                            onDragEnd={(event) => handleDragEnd(data.findIndex(g => g.order === activePage), event)}
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={(event) => handleDragEnd(data.findIndex(g => g.order === orders[activeIndex]), event)}
                             >
-                            <SortableContext
-                                items={currentGroup.testColor.map(item => item.order)}
-                                strategy={verticalListSortingStrategy}
-                            >
-                                <div className="flex flex-col items-center gap-2">
-                                {currentGroup.testColor.map(item => (
-                                    <SortableItem key={item.order} id={item.order} color={item.color} />
-                                ))}
-                                </div>
-                            </SortableContext>
+                                <SortableContext
+                                    items={currentGroup.testColor.map(item => item.order)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    <div className="flex flex-col items-center gap-2">
+                                    {currentGroup.testColor.map(item => (
+                                        <SortableItem key={item.order} id={item.order} color={item.color} />
+                                    ))}
+                                    </div>
+                                </SortableContext>
                             </DndContext>
 
                             <div style={{ backgroundColor: currentGroup.endColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', marginTop: '10px' }}></div>
