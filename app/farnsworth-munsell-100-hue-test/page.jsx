@@ -231,6 +231,7 @@ export default function TestColorComponent() {
 
     const resetResult = () => {
         setIsResult(false);
+        setActiveIndex(0);
         setResult({});
     }
 
