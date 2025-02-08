@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return(
     <div>
-      <div className='mb-9 max-w-xl mx-auto'>
+      <div className='mb-9 max-w-xl mx-auto px-5'>
         <h1 className="font-bold text-xl underline my-5">Tentang Farnsworth Munsell 100 Hue Test</h1>
         <img src="/FM100.jpg" className="my-3" />
         <p className="my-5 text-sm">Tes Warna Farnsworth-Munsell 100 Hue adalah tes untuk sistem penglihatan manusia yang sering digunakan untuk menguji buta warna. Sistem ini dikembangkan oleh Dean Farnsworth pada tahun 1940-an dan menguji kemampuan untuk mengisolasi serta menyusun perbedaan kecil dalam berbagai target warna dengan nilai dan kroma yang konstan, yang mencakup semua rona visual yang dijelaskan oleh sistem warna Munsell.</p>

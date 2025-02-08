@@ -4,6 +4,7 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import {
     SortableContext,
     horizontalListSortingStrategy,
+    verticalListSortingStrategy,
     arrayMove,
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
@@ -221,7 +222,7 @@ export default function TestColorComponent() {
                 setIsResult(true);
                 setResult(dataResult);
                 setIsLoading(false);
-            }, 2000);
+            }, 1500);
         } catch(error) {
             console.log(error);
             setIsLoading(false);
@@ -233,12 +234,30 @@ export default function TestColorComponent() {
         setResult({});
     }
 
+    const [activeIndex, setActiveIndex] = useState(0);
+    const orders = ["A", "B", "C", "D"];
+    const currentGroup = data.find(group => group.order === orders[activeIndex]);
+
+    const handleNext = () => {
+        if (activeIndex < orders.length - 1) {
+            setActiveIndex(prev => prev + 1);
+        } else {
+            handleResult();
+        }
+    };
+
+    const handlePrev = () => {
+        if (activeIndex > 0) {
+            setActiveIndex(prev => prev - 1);
+        }
+    };
+
     if (!isClient) return null;
 
     return (
         <div>
             {isResult ? (
-                <div className='max-w-md mx-auto my-5'>
+                <div className='max-w-md mx-auto my-5 px-5'>
                     <RadarChart data={result} />
                     <div className='bg-yellow-50 border border-yellow-500 p-5 rounded-md my-5'>
                         <p className='font-bold underline'>Keterangan:</p>
@@ -272,66 +291,100 @@ export default function TestColorComponent() {
                     </div>
                 </div>
             ) : (
-                <div className='my-5'>
+                <div className='my-5 px-5'>
                     <div className='mb-9 max-w-xl mx-auto'>
-                        <p className='text-center font-bold'>Susun warna berdasarkan rona (hue) di setiap baris dengan cara menyeret dan meletakkan kotak, lalu klik 'CEK' untuk melihat hasil Anda. Warna pertama dan terakhir di setiap baris sudah tetap. Gunakan PC atau tablet! Tes ini lebih sulit dilakukan di ponsel.</p>
+                        <p className='text-center font-bold my-1'>Susun warna berdasarkan rona (hue) di setiap baris dengan cara menyeret dan meletakkan kotak, lalu klik 'Cek Hasil Test' untuk melihat hasil Anda.</p>
+                        <p className='text-center font-bold my-1'>Warna pertama dan terakhir di setiap baris sudah tetap.</p>
+                        <p className='text-center font-bold my-1'>Jika Anda menggunakan PC atau Tablet geser urutannya secara horizontal dan jika anda menggunakan mobile, geser urutannya secara vertical.</p>
                     </div>
-                    {data.map((group, groupIndex) => (
-                        <div key={group.order} className='mb-4'>
-                        <div className='flex flex-row justify-center items-center'>
-                            <div style={{ 
-                                backgroundColor: group.startColor, 
-                                width: '50px',
-                                height: '50px',
-                                display: 'inline-block',
-                                margin: '0 5px',
-                                borderRadius: '4px',
-                                boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', 
-                                border: '3px solid black',
-                                cursor: 'not-allowed',
-                            }}>
-                            </div>
+                    {/* Drag and Drop Area */}
+                    <div className="w-full">
+                    {window.innerWidth < 768 ? (
+                        // Mobile (Per Page)
+                        currentGroup && (
+                        <div className="flex flex-col items-center">
+                            <div style={{ backgroundColor: currentGroup.startColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', marginBottom: '10px' }}></div>
+
                             <DndContext
-                                collisionDetection={closestCenter}
-                                onDragEnd={(event) => handleDragEnd(groupIndex, event)}
+                            collisionDetection={closestCenter}
+                            onDragEnd={(event) => handleDragEnd(data.findIndex(g => g.order === activePage), event)}
                             >
-                                <SortableContext
-                                    items={group.testColor.map((item) => item.order)}
-                                    strategy={horizontalListSortingStrategy}
-                                >
-                                    <div className="flex flex-wrap md:flex-row overflow-hidden">
-                                        {group.testColor.map((item) => (
-                                            <SortableItem
-                                                key={item.order}
-                                                id={item.order}
-                                                color={item.color}
-                                            />
-                                        ))}
-                                    </div>
-                                </SortableContext>
+                            <SortableContext
+                                items={currentGroup.testColor.map(item => item.order)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                <div className="flex flex-col items-center gap-2">
+                                {currentGroup.testColor.map(item => (
+                                    <SortableItem key={item.order} id={item.order} color={item.color} />
+                                ))}
+                                </div>
+                            </SortableContext>
                             </DndContext>
-                            <div style={{ 
-                                backgroundColor: group.endColor, 
-                                width: '50px',
-                                height: '50px',
-                                display: 'inline-block',
-                                margin: '0 5px',
-                                borderRadius: '4px',
-                                boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)', 
-                                border: '3px solid black',
-                                cursor: 'not-allowed',
-                            }}>
+
+                            <div style={{ backgroundColor: currentGroup.endColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', marginTop: '10px' }}></div>
+                            {/* Navigation Buttons */}
+                            <div className="flex justify-between w-full max-w-sm mt-4">
+                                {/* Tombol Prev */}
+                                <button
+                                    className={`px-4 py-2 rounded-md ${activeIndex === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-gray-500 hover:bg-gray-600 text-white"}`}
+                                    onClick={handlePrev}
+                                    disabled={activeIndex === 0}
+                                >
+                                    Prev
+                                </button>
+
+                                {/* Tombol Next atau Cek Hasil */}
+                                <button
+                                    className={`${isLoading ? 'bg-[#cad8f5]' : 'bg-[#2e5cb8] hover:bg-[#4775d1]'} px-4 py-2 rounded-md`}
+                                    onClick={handleNext}
+                                    disabled={isLoading}
+                                >
+                                    <span className="font-bold text-white">
+                                        {activeIndex === orders.length - 1 ? (isLoading ? "Mohon ditunggu..." : "Cek Hasil Test") : "Next"}
+                                    </span>
+                                </button>
                             </div>
                         </div>
-                        </div>
-                    ))}
-                    <div className="flex justify-center">
-                        <button 
-                        className={`${isLoading ? 'bg-[#cad8f5]' : 'bg-[#2e5cb8] hover:bg-[#4775d1]'} px-4 py-2 rounded-md my-4`} 
-                        onClick={handleResult}
-                        disabled={isLoading}>
-                            <span className="font-bold text-white">{isLoading ? "Loading..." : "Cek Hasil Test"}</span>
-                        </button>
+                        )
+                    ) : (
+                            // Tablet & Desktop (Semua Grup Ditampilkan)
+                            <div>
+                                {data.map((group, groupIndex) => (
+                                <div key={group.order} className="mb-4">
+                                    <div className="flex flex-row justify-center items-center">
+                                    <div style={{ backgroundColor: group.startColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', margin: '0 5px' }}></div>
+    
+                                    <DndContext
+                                        collisionDetection={closestCenter}
+                                        onDragEnd={(event) => handleDragEnd(groupIndex, event)}
+                                    >
+                                        <SortableContext
+                                        items={group.testColor.map(item => item.order)}
+                                        strategy={horizontalListSortingStrategy}
+                                        >
+                                        <div className="flex flex-wrap md:flex-row overflow-hidden">
+                                            {group.testColor.map(item => (
+                                            <SortableItem key={item.order} id={item.order} color={item.color} />
+                                            ))}
+                                        </div>
+                                        </SortableContext>
+                                    </DndContext>
+    
+                                    <div style={{ backgroundColor: group.endColor, width: '50px', height: '50px', borderRadius: '4px', border: '3px solid black', margin: '0 5px' }}></div>
+                                    </div>
+                                </div>
+                                ))}
+                                {/* Button Check Result */}
+                                <div className="flex justify-center">
+                                    <button 
+                                    className={`${isLoading ? 'bg-[#cad8f5]' : 'bg-[#2e5cb8] hover:bg-[#4775d1]'} px-4 py-2 rounded-md my-4`} 
+                                    onClick={handleResult}
+                                    disabled={isLoading}>
+                                        <span className="font-bold text-white">{isLoading ? "Mohon ditunggu..." : "Cek Hasil Test"}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
